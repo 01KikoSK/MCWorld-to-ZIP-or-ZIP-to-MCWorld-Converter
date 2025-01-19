@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>MCWorld to ZIP or ZIP to MCWorld Converter</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        h1 {
+            color: #333;
+        }
+        .container {
+            max-width: 800px;
+            margin: auto;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            background-color: #f9f9f9;
+        }
+        input[type="file"] {
+            display: block;
+            margin-bottom: 10px;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .message {
+            margin-top: 20px;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        .success {
+            background-color: #dff0d8;
+            color: #3c763d;
+        }
+        .error {
+            background-color: #f2dede;
+            color: #a94442;
+        }
+        .log {
+            background-color: #f9f9f9;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            padding: 10px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>MCWorld to ZIP or ZIP to MCWorld Converter</h1>
+        <input type="file" id="fileInput" accept=".mcworld,.zip" multiple>
+        <button onclick="convertFiles()">Convert Files</button>
+        <div id="message" class="message"></div>
+        <div id="log" class="log"></div>
+    </div>
+
+    <script>
+        async function convertFiles() {
+            const fileInput = document.getElementById('fileInput');
+            const files = fileInput.files;
+            const messageDiv = document.getElementById('message');
+            const logDiv = document.getElementById('log');
+
+            if (files.length > 0) {
+                messageDiv.textContent = 'Processing files...';
+                messageDiv.className = 'message';
+
+                // Clear previous log
+                logDiv.innerHTML = '';
+
+                for (const file of files) {
+                    if (file.name.endsWith('.mcworld') || file.name.endsWith('.zip')) {
+                        const formData = new FormData();
+                        formData.append('file', file);
+
+                        try {
+                            // Simulate conversion process
+                            const arrayBuffer = await file.arrayBuffer();
+                            const blob = new Blob([arrayBuffer], { type: 'application/zip' });
+                            const newFileName = file.name.endsWith('.mcworld')
+                                ? file.name.replace('.mcworld', '.zip')
+                                : file.name.replace('.zip', '.mcworld');
+
+                            const link = document.createElement('a');
+                            link.href = URL.createObjectURL(blob);
+                            link.download = newFileName;
+                            link.click();
+
+                            logDiv.innerHTML += `<p>Successfully converted ${file.name}</p>`;
+                            logDiv.className = 'log success';
+                        } catch (error) {
+                            logDiv.innerHTML += `<p>Error converting ${file.name}: ${error.message}</p>`;
+                            logDiv.className = 'log error';
+                        }
+                    } else {
+                        logDiv.innerHTML += `<p>File ${file.name} is not a valid MCWorld or ZIP file. Please select a .mcworld or .zip file.</p>`;
+                        logDiv.className = 'log error';
+                    }
+                }
+                messageDiv.textContent = 'Conversion completed!';
+                messageDiv.className = 'message success';
+            } else {
+                messageDiv.textContent = 'Please select one or more files.';
+                messageDiv.className = 'message error';
+            }
+        }
+    </script>
+</body>
+</html>
